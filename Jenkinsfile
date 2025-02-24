@@ -43,7 +43,11 @@ pipeline {
         }
          stage('Build') {
             steps {
-                sh "mvn package -DskipTests=true"
+                withMaven(
+            // Specify the path to the Maven globalSettings.xml
+            globalSettingsConfig: 'path/to/your/globalSettings.xml'  // Change this path
+          ) {
+            sh 'mvn clean install'
             }
         }
 
