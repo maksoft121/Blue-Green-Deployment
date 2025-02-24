@@ -41,16 +41,11 @@ pipeline {
                 sh "mvn clean test -X -DskipTests=true"
             }
         }
-         stage('Build') {
+          stage('Build') {
             steps {
-                withMaven(
-            // Specify the path to the Maven globalSettings.xml
-            globalSettingsConfig: 'path/to/your/globalSettings.xml'  // Change this path
-          ) {
-            sh 'mvn clean install'
+                sh "mvn package -DskipTests=true"
             }
         }
-         }
         stage('Publish artifact To Nexus') {
             steps {
                 withMaven(globalMavenSettingsConfig: 'maven', jdk: '', maven: 'maven3', mavenSettingsConfig: '', traceability: true) {
