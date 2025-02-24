@@ -41,12 +41,11 @@ pipeline {
                 sh "mvn clean test -X -DskipTests=true"
             }
         }
-          stage('Build') {
+         stage('Build') {
             steps {
-                sh "mvn package -Dskiptests=true"
+                sh "mvn package -DskipTests=true"
             }
         }
-
 
         stage('Publish artifact To Nexus') {
             steps {
