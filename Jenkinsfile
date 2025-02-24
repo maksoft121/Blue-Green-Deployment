@@ -1,6 +1,8 @@
 pipeline {
     agent any
-    
+      tools {
+        maven 'maven3'
+    }
     parameters {
         choice(name: 'DEPLOY_ENV', choices: ['blue', 'green'], description: 'Choose which environment to deploy: Blue or Green')
         choice(name: 'DOCKER_TAG', choices: ['blue', 'green'], description: 'Choose the Docker image tag for the deployment')
@@ -21,11 +23,12 @@ pipeline {
             }
         }
         
-        stage('SonarQube Analysis') {
+        stage('Sonarqube analysis') {
             steps {
-                withSonarQubeEnv('sonar') {
-                    echo "$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectKey=nodejsmysql -Dsonar.projectName=nodejsmysql"
+            withSonarQubeEnv('sonar') {
+                sh "$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectKey=BlueGreen -Dsonar.projectName=BlueGreen -Dsonar.java.binaries=target"
                 }
+                
             }
         }
         
@@ -34,9 +37,30 @@ pipeline {
                 sh "trivy fs --format table -o fs.html ."
             }
         }
+
+         stage('Compile') {
+            steps {
+                sh "mvn compile"
+            }
+        }
+        
+        stage('Tests') {
+            steps {
+                sh "mvn clean test -X -DskipTests=true"
+            }
+        }
           stage('Build') {
             steps {
                 sh "mvn package -Dskiptests=true"
+            }
+        }
+
+
+        stage('Publish artifact To Nexus') {
+            steps {
+                withMaven(globalMavenSettingsConfig: 'maven', jdk: '', maven: 'maven3', mavenSettingsConfig: '', traceability: true) {
+                    sh "mvn deploy -X -DskipTests=true"
+                }
             }
         }
         stage('Docker build') {
