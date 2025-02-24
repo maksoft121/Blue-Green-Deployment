@@ -34,7 +34,11 @@ pipeline {
                 sh "trivy fs --format table -o fs.html ."
             }
         }
-        
+          stage('Build') {
+            steps {
+                sh "mvn package -Dskiptests=true"
+            }
+        }
         stage('Docker build') {
             steps {
                 script {
