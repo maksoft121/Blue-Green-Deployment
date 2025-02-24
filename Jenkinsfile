@@ -50,7 +50,7 @@ pipeline {
             sh 'mvn clean install'
             }
         }
-
+         }
         stage('Publish artifact To Nexus') {
             steps {
                 withMaven(globalMavenSettingsConfig: 'maven', jdk: '', maven: 'maven3', mavenSettingsConfig: '', traceability: true) {
